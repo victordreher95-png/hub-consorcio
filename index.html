@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hub de Consórcio</title>
+<style>
+  /* =========================================================================
+     DESIGN TOKENS — paleta cinza/preto/branco, estilo Apple
+     ========================================================================= */
+  :root {
+    --bg:            #0a0a0c;   /* fundo quase-preto                 */
+    --surface-1:     #141417;   /* superfície elevada (cards)        */
+    --surface-2:     #1c1c20;   /* superfície mais elevada (inputs)  */
+    --surface-hover:  #232328;  /* hover de superfícies              */
+    --border:        #2a2a30;   /* bordas sutis                      */
+    --text:          #f5f5f7;   /* texto principal (branco Apple)    */
+    --text-soft:     #a1a1aa;   /* texto secundário                  */
+    --text-faint:    #6b6b73;   /* texto terciário / placeholders    */
+    --accent:        #6e9eff;   /* único tom de destaque, sutil      */
+    --accent-soft:   rgba(110, 158, 255, 0.12);
+    --radius-lg:     22px;
+    --radius-md:     16px;
+    --radius-sm:     12px;
+    --shadow:        0 10px 40px rgba(0, 0, 0, 0.45);
+    --ease:          cubic-bezier(0.22, 1, 0.36, 1);
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+            system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas,
+            "Roboto Mono", monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.01em;
+    min-height: 100vh;
+  }
+
+  ::selection { background: var(--accent-soft); color: var(--text); }
+
+  /* Scrollbar discreto */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a3a42; }
+
+  /* =========================================================================
+     LAYOUT
+     ========================================================================= */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(10, 10, 12, 0.72);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+  }
+
+  .topbar-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .brand .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 14px var(--accent);
+  }
+  .brand .total-badge {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-soft);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+
+  .search-wrap { flex: 1 1 280px; position: relative; min-width: 200px; }
+  .search-wrap svg {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    width: 17px; height: 17px; stroke: var(--text-faint); pointer-events: none;
+  }
+  .search {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 15px;
+    padding: 11px 14px 11px 40px;
+    border-radius: var(--radius-md);
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease),
+                box-shadow 0.25s var(--ease);
+  }
+  .search::placeholder { color: var(--text-faint); }
+  .search:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--surface-1);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+
+  .btn {
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    padding: 11px 18px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.18s var(--ease), background 0.2s var(--ease),
+                border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  }
+  .btn:hover { background: var(--surface-hover); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0) scale(0.98); }
+  .btn-accent {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0a0a0c;
+  }
+  .btn-accent:hover { background: #84b0ff; box-shadow: 0 6px 20px var(--accent-soft); }
+  .btn-ghost { background: transparent; }
+  .btn-ghost:hover { background: var(--surface-2); }
+
+  .layout {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 28px;
+  }
+
+  /* ---- Sidebar (desktop) ---- */
+  .sidebar { position: sticky; top: 86px; align-self: start; }
+  .sidebar h3 {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-faint); margin: 0 0 12px 8px; font-weight: 600;
+  }
+  .cat-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+  .cat-item {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--text-soft);
+    cursor: pointer;
+    font-size: 14.5px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .cat-item:hover { background: var(--surface-1); color: var(--text); }
+  .cat-item.active {
+    background: var(--accent-soft);
+    color: var(--text);
+    border-color: rgba(110, 158, 255, 0.25);
+  }
+  .cat-item .count {
+    font-size: 12px; color: var(--text-faint);
+    background: var(--surface-2); border-radius: 999px; padding: 1px 8px;
+    min-width: 22px; text-align: center;
+  }
+  .cat-item.active .count { color: var(--accent); background: rgba(110,158,255,0.15); }
+
+  /* ---- Chips (mobile) ---- */
+  .chips {
+    display: none;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 2px 12px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: 0 0 auto;
+    padding: 8px 15px;
+    border-radius: 999px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    font-size: 13.5px; font-weight: 500;
+    cursor: pointer; white-space: nowrap;
+    transition: background 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s;
+  }
+  .chip.active {
+    background: var(--accent-soft); color: var(--text);
+    border-color: rgba(110,158,255,0.3);
+  }
+
+  /* ---- Conteúdo principal ---- */
+  .main { min-width: 0; }
+
+  .section-title {
+    display: flex; align-items: baseline; gap: 10px;
+    margin: 4px 4px 16px;
+  }
+  .section-title h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+  .section-title .sub { font-size: 13px; color: var(--text-faint); }
+
+  .cards { display: flex; flex-direction: column; gap: 14px; }
+
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    transition: transform 0.25s var(--ease), border-color 0.25s var(--ease),
+                box-shadow 0.25s var(--ease), background 0.25s var(--ease);
+    animation: cardIn 0.45s var(--ease) both;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: #3a3a42;
+    background: var(--surface-hover);
+    box-shadow: var(--shadow);
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .card.flash { animation: flash 1s var(--ease); }
+  @keyframes flash {
+    0%   { box-shadow: 0 0 0 0 var(--accent-soft); border-color: var(--accent); }
+    100% { box-shadow: 0 0 0 14px transparent; border-color: var(--border); }
+  }
+
+  .card-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 14px; margin-bottom: 8px;
+  }
+  .card h3.termo { font-size: 19px; font-weight: 650; letter-spacing: -0.02em; }
+  .card .cat-tag {
+    flex: 0 0 auto;
+    font-size: 11.5px; font-weight: 600; letter-spacing: 0.02em;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid rgba(110,158,255,0.2);
+    padding: 3px 10px; border-radius: 999px;
+  }
+
+  .card .definicao { color: var(--text-soft); font-size: 15px; white-space: pre-wrap; }
+  .card .definicao.todo { color: var(--text-faint); font-style: italic; }
+
+  .card .block {
+    margin-top: 14px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+  .card .block .label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--text-faint); font-weight: 600; margin-bottom: 5px;
+  }
+  .card .block .exemplo-text { font-size: 14px; color: var(--text-soft); white-space: pre-wrap; }
+  .card .block.formula .formula-text {
+    font-family: var(--mono);
+    font-size: 14px; color: var(--text);
+    white-space: pre-wrap; word-break: break-word;
+  }
+
+  .card .tags { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .card .tag {
+    font-size: 12px; color: var(--text-soft);
+    background: var(--surface-2); border: 1px solid var(--border);
+    padding: 3px 9px; border-radius: 999px;
+  }
+  .card .meta {
+    margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--text-faint);
+  }
+
+  .empty {
+    text-align: center; padding: 64px 20px; color: var(--text-faint);
+    border: 1px dashed var(--border); border-radius: var(--radius-lg);
+  }
+  .empty .big { font-size: 17px; color: var(--text-soft); margin-bottom: 6px; }
+
+  /* =========================================================================
+     PAINEL "ADICIONAR CONHECIMENTO" (modal slide-over)
+     ========================================================================= */
+  .fab {
+    position: fixed; right: 22px; bottom: 22px; z-index: 60;
+    width: 58px; height: 58px; border-radius: 50%;
+    background: var(--accent); color: #0a0a0c;
+    border: none; cursor: pointer;
+    font-size: 28px; line-height: 1;
+    display: grid; place-items: center;
+    box-shadow: 0 8px 30px rgba(110,158,255,0.4);
+    transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease);
+  }
+  .fab:hover { transform: scale(1.08) rotate(90deg); box-shadow: 0 12px 38px rgba(110,158,255,0.55); }
+  .fab:active { transform: scale(0.96); }
+
+  .overlay {
+    position: fixed; inset: 0; z-index: 70;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s var(--ease);
+  }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+
+  .panel {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 80;
+    width: min(480px, 100%);
+    background: var(--surface-1);
+    border-left: 1px solid var(--border);
+    transform: translateX(105%);
+    transition: transform 0.4s var(--ease);
+    display: flex; flex-direction: column;
+    box-shadow: var(--shadow);
+  }
+  .panel.open { transform: translateX(0); }
+
+  .panel-head {
+    padding: 20px 22px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel-head h2 { font-size: 18px; font-weight: 600; }
+  .panel-close {
+    background: var(--surface-2); border: 1px solid var(--border);
+    color: var(--text-soft); width: 34px; height: 34px; border-radius: 10px;
+    cursor: pointer; font-size: 18px; line-height: 1;
+    transition: background 0.2s, color 0.2s;
+  }
+  .panel-close:hover { background: var(--surface-hover); color: var(--text); }
+
+  .panel-body { padding: 20px 22px; overflow-y: auto; flex: 1; }
+
+  /* Abas: estruturado x texto bruto */
+  .tabs { display: flex; gap: 6px; background: var(--surface-2);
+          padding: 4px; border-radius: var(--radius-md); margin-bottom: 20px; }
+  .tab {
+    flex: 1; text-align: center; padding: 8px; border-radius: 11px;
+    font-size: 13.5px; font-weight: 600; color: var(--text-soft);
+    cursor: pointer; border: none; background: transparent;
+    font-family: var(--font);
+    transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .tab.active { background: var(--surface-hover); color: var(--text); box-shadow: 0 1px 6px rgba(0,0,0,0.3); }
+
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block; font-size: 13px; font-weight: 600; color: var(--text-soft);
+    margin-bottom: 7px; letter-spacing: -0.01em;
+  }
+  .field label .opt { color: var(--text-faint); font-weight: 500; }
+  .input, .textarea, .select {
+    width: 100%; font-family: var(--font); font-size: 14.5px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    color: var(--text); padding: 11px 13px; border-radius: var(--radius-sm);
+    transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s;
+  }
+  .textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+  .textarea.big { min-height: 200px; }
+  .textarea.mono { font-family: var(--mono); font-size: 13.5px; }
+  .input:focus, .textarea:focus, .select:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft); background: var(--surface-1);
+  }
+  .input::placeholder, .textarea::placeholder { color: var(--text-faint); }
+  .select { appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6b73' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 13px center; padding-right: 36px; }
+
+  .new-cat-row { display: none; gap: 8px; margin-top: 8px; }
+  .new-cat-row.show { display: flex; }
+
+  .hint { font-size: 12px; color: var(--text-faint); margin-top: 6px; line-height: 1.5; }
+
+  .panel-foot {
+    padding: 16px 22px; border-top: 1px solid var(--border);
+    display: flex; gap: 10px;
+  }
+  .panel-foot .btn { flex: 1; justify-content: center; }
+
+  /* Toast */
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px);
+    z-index: 100; background: var(--surface-hover); border: 1px solid var(--border);
+    color: var(--text); padding: 13px 22px; border-radius: 999px;
+    font-size: 14px; font-weight: 500; box-shadow: var(--shadow);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .toast .check { color: var(--accent); margin-right: 8px; }
+
+  /* =========================================================================
+     RESPONSIVO — mobile-first refinements
+     ========================================================================= */
+  @media (max-width: 820px) {
+    .layout { grid-template-columns: 1fr; gap: 8px; padding: 16px 16px 90px; }
+    .sidebar { display: none; }
+    .chips { display: flex; }
+    .topbar-inner { gap: 12px; }
+    .brand { font-size: 16px; }
+    .card { padding: 18px 18px; }
+    .panel { width: 100%; }
+  }
+  @media (max-width: 420px) {
+    .brand .total-badge { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ====================== TOPO: marca + busca ====================== -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="dot"></span>
+        <span>Hub de Consórcio</span>
+        <span class="total-badge" id="totalBadge">0 conceitos</span>
+      </div>
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path>
+        </svg>
+        <input id="search" class="search" type="search"
+               placeholder="Buscar por termo, definição ou tag…" autocomplete="off" />
+      </div>
+      <button class="btn btn-accent" id="openPanelTop">+ Adicionar</button>
+    </div>
+  </header>
+
+  <!-- ====================== LAYOUT PRINCIPAL ====================== -->
+  <div class="layout">
+    <!-- Sidebar (desktop) -->
+    <aside class="sidebar">
+      <h3>Categorias</h3>
+      <ul class="cat-list" id="catList"></ul>
+    </aside>
+
+    <!-- Conteúdo -->
+    <main class="main">
+      <!-- Chips (mobile) -->
+      <div class="chips" id="chips"></div>
+
+      <div class="section-title">
+        <h2 id="sectionTitle">Todos</h2>
+        <span class="sub" id="sectionSub"></span>
+      </div>
+
+      <div class="cards" id="cards"></div>
+    </main>
+  </div>
+
+  <!-- ====================== BOTÃO FLUTUANTE ====================== -->
+  <button class="fab" id="openPanelFab" aria-label="Adicionar conhecimento">+</button>
+
+  <!-- ====================== PAINEL ADICIONAR ====================== -->
+  <div class="overlay" id="overlay"></div>
+  <aside class="panel" id="panel" aria-hidden="true">
+    <div class="panel-head">
+      <h2>Adicionar conhecimento</h2>
+      <button class="panel-close" id="closePanel" aria-label="Fechar">×</button>
+    </div>
+
+    <div class="panel-body">
+      <!-- Abas -->
+      <div class="tabs">
+        <button class="tab active" data-tab="form" id="tabForm">Estruturado</button>
+        <button class="tab" data-tab="raw" id="tabRaw">Colar texto bruto</button>
+      </div>
+
+      <!-- MODO: texto bruto -->
+      <div id="rawMode" style="display:none">
+        <div class="field">
+          <label>Texto livre</label>
+          <textarea class="textarea big mono" id="rawText"
+            placeholder="Cole ou escreva livremente.&#10;&#10;Dica: a 1ª linha vira o TERMO; o resto vira a DEFINIÇÃO.&#10;Você também pode usar rótulos como:&#10;Termo: ...&#10;Categoria: ...&#10;Definição: ...&#10;Exemplo: ...&#10;Fórmula: ...&#10;Tags: a, b, c"></textarea>
+          <p class="hint">Ao clicar em <b>Estruturar</b>, o conteúdo é organizado e pré-preenche
+            os campos estruturados para você revisar antes de salvar.</p>
+        </div>
+        <button class="btn btn-accent" id="structureBtn" style="width:100%; justify-content:center;">
+          Estruturar →
+        </button>
+      </div>
+
+      <!-- MODO: estruturado -->
+      <div id="formMode">
+        <div class="field">
+          <label for="fTermo">Termo</label>
+          <input class="input" id="fTermo" type="text" placeholder="Ex.: Carta de crédito" />
+        </div>
+
+        <div class="field">
+          <label for="fCategoria">Categoria</label>
+          <select class="select" id="fCategoria"></select>
+          <div class="new-cat-row" id="newCatRow">
+            <input class="input" id="fNovaCat" type="text" placeholder="Nome da nova categoria" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="fDefinicao">Definição</label>
+          <textarea class="textarea" id="fDefinicao" placeholder="O que é, como funciona…"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="fExemplo">Exemplo <span class="opt">(opcional)</span></label>
+          <textarea class="textarea" id="fExemplo" placeholder="Um caso prático…"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="fFormula">Fórmula <span class="opt">(opcional)</span></label>
+          <textarea class="textarea mono" id="fFormula" placeholder="Ex.: parcela = (valor_credito / prazo) + taxa_adm"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="fTags">Tags <span class="opt">(separadas por vírgula)</span></label>
+          <input class="input" id="fTags" type="text" placeholder="crédito, contemplação, lance" />
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-foot" id="formFoot">
+      <button class="btn btn-ghost" id="clearForm">Limpar</button>
+      <button class="btn btn-accent" id="saveBtn">Salvar conceito</button>
+    </div>
+  </aside>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"><span class="check">✓</span><span id="toastMsg">Salvo</span></div>
+
+<script>
+/* =============================================================================
+   FONTE PERMANENTE DE CONHECIMENTO
+   -----------------------------------------------------------------------------
+   Este é o coração do hub. Edite este array para adicionar/alterar conceitos de
+   forma PERMANENTE (eles ficam versionados no arquivo). Conceitos adicionados
+   pelo painel durante a sessão vivem só em memória — para torná-los permanentes,
+   cole-os aqui no mesmo formato.
+
+   Estrutura de cada entrada:
+     {
+       id:          número único (use o próximo inteiro disponível),
+       categoria:   string (agrupa os cards),
+       termo:       string (título do conceito),
+       definicao:   string (texto principal; use "" se ainda não escreveu),
+       exemplo:     string opcional ("" se não houver),
+       formula:     string opcional ("" se não houver) — exibida em monoespaçado,
+       tags:        array de strings,
+       atualizado_em: data ISO "AAAA-MM-DD"
+     }
+   ========================================================================== */
+const CONHECIMENTO = [
+  {
+    id: 1,
+    categoria: "Fundamentos",
+    termo: "Consórcio",
+    definicao: "Sistema de compra programada em que um grupo de pessoas se une, administrado por uma empresa autorizada pelo Banco Central, para formar uma poupança coletiva destinada à aquisição de um bem ou serviço (imóvel, veículo, etc.). Cada participante paga parcelas mensais e, periodicamente, um ou mais integrantes são contemplados — recebendo uma carta de crédito para adquirir o bem — por sorteio ou por lance. Diferença para financiamento: no financiamento você toma dinheiro emprestado e paga juros ao banco; no consórcio não há juros, apenas uma taxa de administração, em troca de nem sempre receber o crédito de imediato (depende de sorteio ou lance).",
+    exemplo: "Num grupo de 100 pessoas para um carro de R$ 100 mil, todos pagam parcelas mensais; a cada mês há sorteios e lances, e quem é contemplado pega a carta de crédito, compra o carro na hora e segue pagando as parcelas restantes.",
+    formula: "",
+    tags: ["fundamentos", "definição", "grupo", "contemplação", "carta de crédito", "financiamento"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 2,
+    categoria: "Fundamentos",
+    termo: "Contemplação",
+    definicao: "Momento em que o consorciado adquire o direito à carta de crédito, podendo então usar o valor para comprar o bem. Acontece por sorteio ou por lance.",
+    exemplo: "",
+    formula: "",
+    tags: ["contemplação", "sorteio", "lance"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 3,
+    categoria: "Fundamentos",
+    termo: "Lance",
+    definicao: "Oferta de antecipação de parcelas que o consorciado faz para tentar ser contemplado mais rápido. Quem oferece o maior lance numa assembleia leva a contemplação.",
+    exemplo: "",
+    formula: "",
+    tags: ["lance", "contemplação"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 4,
+    categoria: "Fundamentos",
+    termo: "Carta de crédito",
+    definicao: "Valor que o consorciado recebe ao ser contemplado, usado para comprar o bem à vista. Funciona como poder de compra: muitas vezes negocia-se melhor como comprador à vista do que num financiamento.",
+    exemplo: "",
+    formula: "",
+    tags: ["carta de crédito", "contemplação", "poder de compra"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 5,
+    categoria: "Fundamentos",
+    termo: "Taxa de administração",
+    definicao: "Valor cobrado pela administradora pela gestão do grupo, diluído nas parcelas ao longo do plano. É o custo do consórcio no lugar dos juros do financiamento.",
+    exemplo: "",
+    formula: "",
+    tags: ["taxa", "custo", "administradora"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 6,
+    categoria: "Fundamentos",
+    termo: "Fundo de reserva",
+    definicao: "Reserva financeira do grupo para cobrir imprevistos, como inadimplência. Em geral, o saldo não utilizado pode ser devolvido ao consorciado ao fim do grupo.",
+    exemplo: "",
+    formula: "",
+    tags: ["fundo de reserva", "grupo"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 7,
+    categoria: "Fundamentos",
+    termo: "Assembleia",
+    definicao: "Reunião periódica (geralmente mensal) do grupo onde acontecem os sorteios e a disputa de lances, definindo os contemplados do mês.",
+    exemplo: "",
+    formula: "",
+    tags: ["assembleia", "sorteio", "lance"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 8,
+    categoria: "Mecânica de Lance",
+    termo: "Lance embutido",
+    definicao: "Modalidade em que parte do próprio crédito a receber é usada como lance, sem o consorciado precisar tirar dinheiro do bolso. Na HS, é fixo em 30%. Na prática, quase todo mundo usa o lance embutido, porque os lances vencedores beiram 50% do crédito (somando lance livre + embutido). Não faz sentido tirar 50% do valor do crédito do próprio bolso só para contemplar — com esse dinheiro a pessoa compraria uma cota já contemplada, ou pegaria um financiamento com entrada alta pagando menos. Com o lance embutido ela usa 30% do crédito + cerca de 20% em dinheiro e mantém uma boa chance de contemplar, sem descapitalizar.",
+    exemplo: "Lance vencedor de ~50% do crédito = 30% embutido (do próprio crédito) + ~20% em dinheiro do bolso.",
+    formula: "",
+    tags: ["lance embutido", "lance livre", "contemplação", "HS", "30%", "estratégia"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 9,
+    categoria: "Mercado",
+    termo: "Deságio",
+    definicao: "É quando alguém perde dinheiro numa negociação. No consórcio, é o prejuízo que o vendedor aceita ao repassar uma cota não contemplada por menos do que já pagou nela.",
+    exemplo: "Alguém gastou R$ 20 mil numa cota e aceita vendê-la por R$ 5 mil → deságio de R$ 15 mil.",
+    formula: "",
+    tags: ["deságio", "prejuízo", "negociação", "cota não contemplada"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 10,
+    categoria: "Mercado",
+    termo: "Quitação",
+    definicao: "Modalidade onde se compra cotas que têm o valor de crédito menor que o saldo devedor — ou seja, cotas em que a taxa de administração já foi toda paga. O escritório quita o restante da carta e recebe essa diferença. É uma prática do mercado de consórcio em geral (a Rama tem foco nisso, mas não é exclusividade dela).",
+    exemplo: "",
+    formula: "",
+    tags: ["quitação", "saldo devedor", "taxa de administração", "carta de crédito"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 11,
+    categoria: "Índices",
+    termo: "INCC",
+    definicao: "Índice Nacional de Custo da Construção. Índice usado para reajustar o valor das cotas de consórcio de imóveis.",
+    exemplo: "",
+    formula: "",
+    tags: ["INCC", "reajuste", "imóvel", "índice"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 12,
+    categoria: "Índices",
+    termo: "IPCA",
+    definicao: "Índice de Preços ao Consumidor Amplo. Índice de inflação usado para reajustar cotas de consórcio de veículos.",
+    exemplo: "",
+    formula: "",
+    tags: ["IPCA", "reajuste", "veículo", "índice"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 13,
+    categoria: "Mercado",
+    termo: "Brick",
+    definicao: "Gíria gaúcha para fechar um negócio de compra e venda de cota — o fechamento do brick.",
+    exemplo: "",
+    formula: "",
+    tags: ["brick", "gíria", "fechamento"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 14,
+    categoria: "Ecossistema",
+    termo: "HS Consórcios",
+    definicao: "Administradora de consórcios (a empresa autorizada e fiscalizada pelo Banco Central que de fato gere os grupos, realiza assembleias e emite as cartas de crédito — o \"fabricante\" do produto). Fundada em 1993, faz parte do Grupo Herval e tem sede em Dois Irmãos/RS (Rodovia BR 116, Km 224, Portal da Serra). É associada à ABAC e se posiciona como a maior administradora independente de consórcios do Brasil nos segmentos de veículos e imóveis. Regra dos escritórios parceiros: a venda de cota nova é feita preferencialmente (e exclusivamente) com a HS; já as demais modalidades (deságio, quitação, contempladas) são trabalhadas com qualquer administradora ou banco.",
+    exemplo: "Compliance: a própria HS declara oficialmente que NÃO comercializa cotas contempladas nem garante data de contemplação. Por isso o mercado de contempladas, deságio e quitação acontece através dos escritórios parceiros, não pela administradora diretamente.",
+    formula: "",
+    tags: ["HS", "administradora", "Dois Irmãos", "Grupo Herval", "Banco Central", "ABAC", "cota nova"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 15,
+    categoria: "Ecossistema",
+    termo: "CEI — Consórcios & Investimentos (Igrejinha)",
+    definicao: "Escritório matriz, em Igrejinha/RS — o primeiro do grupo. Faz a operação completa: vende cota nova, vende contemplada, compra deságio e quitação, vende deságio e vende junção de contemplada.",
+    exemplo: "",
+    formula: "",
+    tags: ["CEI", "Igrejinha", "escritório", "matriz", "cota nova", "contemplada"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 16,
+    categoria: "Ecossistema",
+    termo: "CEI-C — Consórcios & Investimentos (Canela)",
+    definicao: "Escritório em Canela/RS. Foco em venda de cota nova e compra de deságio/quitação. Faz também tudo o que a CEI de Igrejinha faz.",
+    exemplo: "",
+    formula: "",
+    tags: ["CEI-C", "Canela", "escritório", "cota nova", "deságio", "quitação"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 17,
+    categoria: "Ecossistema",
+    termo: "Contemplados RS",
+    definicao: "Escritório em Gramado/RS, focado na venda de cotas contempladas. Também faz todas as outras modalidades: deságio, quitação, cota nova, etc.",
+    exemplo: "",
+    formula: "",
+    tags: ["Contemplados RS", "Gramado", "escritório", "contempladas"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 18,
+    categoria: "Ecossistema",
+    termo: "Rama Soluções em Consórcios",
+    definicao: "Escritório em Gramado/RS, com foco em deságio e quitações. Compra carteiras de outros escritórios que fecham. Também vende contempladas e cotas novas, mas não é o foco. É o escritório que mais usa a estratégia de troca de cotas (todos os escritórios também fazem, mas a Rama é a que mais utiliza).",
+    exemplo: "",
+    formula: "",
+    tags: ["Rama", "Gramado", "escritório", "deságio", "quitação", "arbitragem", "troca de cotas"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 19,
+    categoria: "Mercado",
+    termo: "Faixa de deságio na prática",
+    definicao: "O deságio é calculado sobre o valor total pago na cota. A Rama compra deságios com ofertas que variam: a média fica entre 20% e 25% de deságio, mas pode chegar a 30% (quando há urgência e a cota é boa) ou ir bem mais para baixo — já foram compradas cotas com apenas 9% de deságio. Quando o lead se enquadra em \"quitação\", a proposta tende a ser maior (mais vantajosa para o cliente) do que numa compra por deságio puro.",
+    exemplo: "Faixas reais de compra: de 9% até ~30% de deságio, com média de 20–25%, sempre calculado sobre o total já pago na cota.",
+    formula: "",
+    tags: ["deságio", "faixa", "percentual", "quitação", "compra de cota"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 20,
+    categoria: "Estratégias",
+    termo: "Troca de cotas (Troca Inteligente)",
+    definicao: "Estratégia que a Rama mais usa: em vez de simplesmente comprar a cota do cliente por deságio, oferece-se a ele uma troca — uma cota do banco de cotas já compradas pela Rama (uma cota de deságio) + um valor no Pix que cobre o que ele já gastou. Assim o cliente sai da cota atual sem sair do consórcio, e a Rama movimenta o estoque de cotas. O Gerador de Propostas é usado para montar essas combinações.",
+    exemplo: "(números provisórios, a ajustar) Cliente com cota de veículo, R$ 23 mil já pagos. A Rama oferece uma cota com R$ 14 mil pagos + R$ 9 mil no Pix.",
+    formula: "",
+    tags: ["troca de cotas", "troca inteligente", "banco de cotas", "pix", "gerador de propostas", "rama"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 21,
+    categoria: "Estratégias",
+    termo: "Quando fazer a troca de cotas",
+    definicao: "A troca é interessante para o cliente em vários cenários: quando quer desistir daquela cota específica mas não do consórcio em si; quando mudou de planos; quando precisa recuperar só uma parte do valor com urgência; quando a parcela está alta e precisa de uma menor; ou — no caso de investidor — quando chegou no ponto em que a contemplação não daria mais lucro acima do rendimento do CDB ao mês (esse é o cenário da \"troca inteligente\" para investidores).",
+    exemplo: "",
+    formula: "",
+    tags: ["troca de cotas", "troca inteligente", "desistência", "parcela", "investidor", "CDB", "urgência"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 22,
+    categoria: "Estratégias",
+    termo: "L.A.R. — os 3 cenários",
+    definicao: "Sigla de Lucro, Alavancagem e Rentabilidade — estratégia exclusiva do escritório para imóvel. No exemplo da apresentação: crédito de R$ 500 mil, meia parcela de ~R$ 1.397, reajuste anual do crédito de 6,36% a.a., venda da carta por ágio de 25% do crédito atualizado. Tem três caminhos: (1) Contempla cedo e vende — o cliente contempla, vende a carta com ágio e realiza lucro logo no começo, pois o investido acumulado ainda é baixo perto do valor de venda. (2) Contempla mais tarde, vira patrimônio + locação — o lucro de revenda já não é tão expressivo, então o investidor usa o crédito para comprar o bem e locar; o rendimento de locação (~0,7% ao mês sobre o valor do bem, média aluguel/Airbnb) abate a parcela cheia, transformando o consórcio em patrimônio que se paga. (3) Mesmo sem contemplar — o reajuste anual faz o crédito subir ano após ano, e no fim das contas o cliente pagou menos do que pagaria em outras modalidades de crédito.",
+    exemplo: "",
+    formula: "",
+    tags: ["L.A.R.", "imóvel", "contempla e vende", "locação", "patrimônio", "reajuste", "ágio", "estratégia"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 23,
+    categoria: "Fundamentos",
+    termo: "Meia parcela",
+    definicao: "Inovação da HS: até ser contemplado, o consorciado paga só metade da parcela, com a taxa de administração incidindo sobre a metade do crédito — deixando o custo mais acessível na fase de espera. As metades não pagas vão se acumulando no saldo devedor. Ao contemplar, a parcela é recalculada e o cliente passa a pagar também essas metades que ficaram, diluídas nas parcelas restantes.",
+    exemplo: "Carta de R$ 70 mil (base nominal) → parcela cheia R$ 812, meia parcela R$ 406. Após a contemplação, a parcela é recalculada a partir do saldo devedor.",
+    formula: "",
+    tags: ["meia parcela", "HS", "parcela", "contemplação", "saldo devedor"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 24,
+    categoria: "Fundamentos",
+    termo: "Cálculo da parcela",
+    definicao: "A parcela não é simplesmente o dobro da meia parcela. Ela é o saldo devedor dividido pelo número de parcelas restantes — ou seja, o que falta pagar é diluído no que resta do plano. Por isso, quem pagou meia parcela até a contemplação acumulou as metades não pagas dentro do saldo devedor, e ao contemplar a parcela sobe, porque essas metades passam a ser cobradas diluídas no restante.",
+    exemplo: "Se o saldo devedor é R$ X e faltam N parcelas, a parcela passa a ser R$ X ÷ N.",
+    formula: "parcela = saldo_devedor / parcelas_restantes",
+    tags: ["parcela", "cálculo", "saldo devedor", "parcelas restantes", "meia parcela"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 25,
+    categoria: "Fundamentos",
+    termo: "Reajuste do crédito",
+    definicao: "O valor do crédito é corrigido todo ano, no aniversário do grupo: imóvel pelo INCC, veículo pelo IPCA. Por isso o crédito sobe ano após ano — e essa correção é parte do que torna o consórcio competitivo mesmo numa contemplação tardia, porque o poder de compra do crédito acompanha (ou supera) a inflação.",
+    exemplo: "",
+    formula: "",
+    tags: ["reajuste", "crédito", "INCC", "IPCA", "aniversário", "anual"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 26,
+    categoria: "Fundamentos",
+    termo: "Saldo devedor",
+    definicao: "Quanto ainda falta pagar no consórcio para finalizar o plano (total do plano menos o que já foi pago). É a referência usada, por exemplo, para identificar cotas elegíveis à quitação (quando o crédito a receber é menor que o saldo devedor) e para recalcular a parcela após a contemplação.",
+    exemplo: "",
+    formula: "",
+    tags: ["saldo devedor", "quitação", "parcela", "plano"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 27,
+    categoria: "Fundamentos",
+    termo: "Fundo comum",
+    definicao: "A poupança coletiva do grupo: a parte da parcela que vai para o caixa comum usado para comprar os bens e liberar as cartas de crédito dos contemplados. É diferente do fundo de reserva (que cobre imprevistos) e da taxa de administração (que remunera a administradora).",
+    exemplo: "",
+    formula: "",
+    tags: ["fundo comum", "grupo", "poupança coletiva", "caixa"],
+    atualizado_em: "2026-06-22"
+  },
+  {
+    id: 28,
+    categoria: "Fundamentos",
+    termo: "Recuperação do fundo comum no fim do grupo",
+    definicao: "Ao encerrar o grupo, o consorciado recebe de volta o fundo comum descontado de cerca de 30% dele. Na prática, quem tem R$ 100 mil de fundo comum recebe em média R$ 70 mil no fim do grupo.",
+    exemplo: "R$ 100 mil de fundo comum → devolução média de ~R$ 70 mil ao encerrar o grupo.",
+    formula: "",
+    tags: ["fundo comum", "devolução", "encerramento", "grupo", "recuperação"],
+    atualizado_em: "2026-06-22"
+  }
+];
+
+/* =============================================================================
+   ESTADO EM MEMÓRIA
+   -----------------------------------------------------------------------------
+   `entradas` começa como cópia de CONHECIMENTO e recebe os itens adicionados na
+   sessão. Não há localStorage (não funciona no preview); a persistência real é
+   o array CONHECIMENTO acima.
+   ========================================================================== */
+let entradas = CONHECIMENTO.map(e => ({ ...e, tags: [...e.tags] }));
+let proximoId = entradas.reduce((m, e) => Math.max(m, e.id), 0) + 1;
+
+let categoriaAtiva = "__todas__";   // filtro de categoria selecionado
+let termoBusca = "";                 // texto da busca
+
+/* ---- Helpers ---- */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => document.querySelectorAll(sel);
+
+function hojeISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+function dataLegivel(iso) {
+  if (!iso) return "";
+  const [a, m, d] = iso.split("-");
+  return `${d}/${m}/${a}`;
+}
+function esc(str) {
+  return String(str)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+// Categorias únicas, ordenadas, com "Fundamentos" sempre primeiro se existir.
+function categorias() {
+  const set = [...new Set(entradas.map(e => e.categoria))];
+  set.sort((a, b) => {
+    if (a === "Fundamentos") return -1;
+    if (b === "Fundamentos") return 1;
+    return a.localeCompare(b, "pt-BR");
+  });
+  return set;
+}
+function contagemPorCategoria(cat) {
+  return entradas.filter(e => e.categoria === cat).length;
+}
+
+/* =============================================================================
+   FILTRO + RENDERIZAÇÃO
+   ========================================================================== */
+function entradasFiltradas() {
+  const q = termoBusca.trim().toLowerCase();
+  return entradas.filter(e => {
+    if (categoriaAtiva !== "__todas__" && e.categoria !== categoriaAtiva) return false;
+    if (!q) return true;
+    const alvo = [
+      e.termo, e.definicao, e.exemplo, e.formula, (e.tags || []).join(" ")
+    ].join(" ").toLowerCase();
+    return alvo.includes(q);
+  });
+}
+
+function renderNav() {
+  const cats = categorias();
+  const total = entradas.length;
+
+  // Sidebar
+  const list = $("#catList");
+  let html = `
+    <li class="cat-item ${categoriaAtiva === "__todas__" ? "active" : ""}" data-cat="__todas__">
+      <span>Todos</span><span class="count">${total}</span>
+    </li>`;
+  html += cats.map(c => `
+    <li class="cat-item ${categoriaAtiva === c ? "active" : ""}" data-cat="${esc(c)}">
+      <span>${esc(c)}</span><span class="count">${contagemPorCategoria(c)}</span>
+    </li>`).join("");
+  list.innerHTML = html;
+  list.querySelectorAll(".cat-item").forEach(el =>
+    el.addEventListener("click", () => selecionarCategoria(el.dataset.cat)));
+
+  // Chips (mobile)
+  const chips = $("#chips");
+  let chtml = `<button class="chip ${categoriaAtiva === "__todas__" ? "active" : ""}" data-cat="__todas__">Todos · ${total}</button>`;
+  chtml += cats.map(c => `
+    <button class="chip ${categoriaAtiva === c ? "active" : ""}" data-cat="${esc(c)}">${esc(c)} · ${contagemPorCategoria(c)}</button>`).join("");
+  chips.innerHTML = chtml;
+  chips.querySelectorAll(".chip").forEach(el =>
+    el.addEventListener("click", () => selecionarCategoria(el.dataset.cat)));
+
+  // Badge total
+  $("#totalBadge").textContent = `${total} ${total === 1 ? "conceito" : "conceitos"}`;
+}
+
+function renderCards() {
+  const itens = entradasFiltradas();
+
+  // Título da seção
+  $("#sectionTitle").textContent =
+    categoriaAtiva === "__todas__" ? "Todos os conceitos" : categoriaAtiva;
+  $("#sectionSub").textContent =
+    `${itens.length} ${itens.length === 1 ? "resultado" : "resultados"}` +
+    (termoBusca ? ` para “${termoBusca}”` : "");
+
+  const wrap = $("#cards");
+  if (itens.length === 0) {
+    wrap.innerHTML = `
+      <div class="empty">
+        <div class="big">Nada por aqui ainda</div>
+        <div>${termoBusca ? "Tente outra busca." : "Adicione seu primeiro conceito no botão +."}</div>
+      </div>`;
+    return;
+  }
+
+  wrap.innerHTML = itens.map((e, i) => {
+    const semDef = !e.definicao || !e.definicao.trim();
+    const def = semDef
+      ? `<p class="definicao todo">Definição a preencher.</p>`
+      : `<p class="definicao">${esc(e.definicao)}</p>`;
+    const exemplo = e.exemplo && e.exemplo.trim() ? `
+      <div class="block">
+        <div class="label">Exemplo</div>
+        <div class="exemplo-text">${esc(e.exemplo)}</div>
+      </div>` : "";
+    const formula = e.formula && e.formula.trim() ? `
+      <div class="block formula">
+        <div class="label">Fórmula</div>
+        <div class="formula-text">${esc(e.formula)}</div>
+      </div>` : "";
+    const tags = (e.tags && e.tags.length) ? `
+      <div class="tags">${e.tags.map(t => `<span class="tag">#${esc(t)}</span>`).join("")}</div>` : "";
+
+    return `
+      <article class="card" data-id="${e.id}" style="animation-delay:${Math.min(i * 0.04, 0.4)}s">
+        <div class="card-head">
+          <h3 class="termo">${esc(e.termo)}</h3>
+          <span class="cat-tag">${esc(e.categoria)}</span>
+        </div>
+        ${def}
+        ${exemplo}
+        ${formula}
+        ${tags}
+        <div class="meta">Atualizado em ${dataLegivel(e.atualizado_em)}</div>
+      </article>`;
+  }).join("");
+}
+
+function render() { renderNav(); renderCards(); }
+
+function selecionarCategoria(cat) {
+  categoriaAtiva = cat;
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* =============================================================================
+   PAINEL — abrir/fechar + abas
+   ========================================================================== */
+function abrirPainel() {
+  $("#overlay").classList.add("open");
+  $("#panel").classList.add("open");
+  $("#panel").setAttribute("aria-hidden", "false");
+  preencherDropdownCategorias();
+  setTimeout(() => $("#fTermo").focus(), 350);
+}
+function fecharPainel() {
+  $("#overlay").classList.remove("open");
+  $("#panel").classList.remove("open");
+  $("#panel").setAttribute("aria-hidden", "true");
+}
+function trocarAba(aba) {
+  const isForm = aba === "form";
+  $("#tabForm").classList.toggle("active", isForm);
+  $("#tabRaw").classList.toggle("active", !isForm);
+  $("#formMode").style.display = isForm ? "block" : "none";
+  $("#rawMode").style.display = isForm ? "none" : "block";
+  $("#formFoot").style.display = isForm ? "flex" : "none";
+}
+
+/* Dropdown de categorias + opção "criar nova" */
+function preencherDropdownCategorias(selecionar) {
+  const sel = $("#fCategoria");
+  const cats = categorias();
+  sel.innerHTML =
+    cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("") +
+    `<option value="__nova__">+ Criar nova categoria…</option>`;
+  if (selecionar && cats.includes(selecionar)) sel.value = selecionar;
+  atualizarLinhaNovaCat();
+}
+function atualizarLinhaNovaCat() {
+  const ehNova = $("#fCategoria").value === "__nova__";
+  $("#newCatRow").classList.toggle("show", ehNova);
+  if (ehNova) setTimeout(() => $("#fNovaCat").focus(), 50);
+}
+
+/* =============================================================================
+   PARSER DO "TEXTO BRUTO" → pré-preenche os campos estruturados
+   -----------------------------------------------------------------------------
+   Estratégia (sem IA, só padrões):
+   1) Reconhece rótulos no início de linha (Termo:, Categoria:, Definição:,
+      Exemplo:, Fórmula:, Tags:) — com ou sem acento, maiúsc/minúsc.
+   2) O que não tiver rótulo: 1ª linha não-vazia vira TERMO, o restante vira
+      DEFINIÇÃO. Linhas que pareçam fórmula (têm =, +, ×, /, %) viram FÓRMULA.
+   ========================================================================== */
+const ROTULOS = {
+  termo:     ["termo", "conceito", "titulo", "título", "nome"],
+  categoria: ["categoria", "cat", "grupo"],
+  definicao: ["definicao", "definição", "definiçao", "definicão", "descricao", "descrição", "def", "significado"],
+  exemplo:   ["exemplo", "ex", "caso", "exemplos"],
+  formula:   ["formula", "fórmula", "calculo", "cálculo", "conta"],
+  tags:      ["tags", "tag", "etiquetas", "palavras-chave", "palavras chave"]
+};
+
+function identificarRotulo(linha) {
+  const m = linha.match(/^\s*([\wçãáàâéêíóôõúü\- ]{2,20})\s*:\s*(.*)$/i);
+  if (!m) return null;
+  const chave = m[1].trim().toLowerCase();
+  for (const campo in ROTULOS) {
+    if (ROTULOS[campo].includes(chave)) return { campo, valor: m[2] };
+  }
+  return null;
+}
+
+function pareceFormula(linha) {
+  // tem operador matemático e não é frase longa
+  return /[=×÷]|(\s[+\-*/]\s)|%/.test(linha) && linha.length < 120;
+}
+
+function estruturarTextoBruto(texto) {
+  const out = { termo: "", categoria: "", definicao: "", exemplo: "", formula: "", tags: "" };
+  const linhas = texto.replace(/\r/g, "").split("\n");
+
+  let campoAtual = null;           // rótulo "aberto" recebendo continuação
+  const semRotulo = [];            // linhas que não pertencem a nenhum rótulo
+
+  for (const linha of linhas) {
+    const rot = identificarRotulo(linha);
+    if (rot) {
+      campoAtual = rot.campo;
+      out[rot.campo] = (out[rot.campo] ? out[rot.campo] + "\n" : "") + rot.valor.trim();
+      continue;
+    }
+    if (linha.trim() === "") { campoAtual = null; continue; }
+    if (campoAtual) {
+      // continuação de um campo rotulado (texto multi-linha)
+      out[campoAtual] += "\n" + linha.trim();
+    } else {
+      semRotulo.push(linha.trim());
+    }
+  }
+
+  // Distribui as linhas sem rótulo: 1ª = termo, fórmulas = fórmula, resto = definição
+  if (semRotulo.length) {
+    if (!out.termo) out.termo = semRotulo.shift();
+    const defs = [], forms = [];
+    for (const l of semRotulo) (pareceFormula(l) ? forms : defs).push(l);
+    if (!out.definicao && defs.length) out.definicao = defs.join("\n");
+    else if (defs.length) out.definicao += "\n" + defs.join("\n");
+    if (!out.formula && forms.length) out.formula = forms.join("\n");
+  }
+
+  // Limpa
+  for (const k in out) out[k] = out[k].trim();
+  return out;
+}
+
+function aplicarEstrutura(dados) {
+  $("#fTermo").value = dados.termo || "";
+  $("#fDefinicao").value = dados.definicao || "";
+  $("#fExemplo").value = dados.exemplo || "";
+  $("#fFormula").value = dados.formula || "";
+  $("#fTags").value = dados.tags || "";
+
+  // Categoria: se veio do texto e não existe, prepara criação da nova
+  if (dados.categoria) {
+    const cats = categorias();
+    const match = cats.find(c => c.toLowerCase() === dados.categoria.toLowerCase());
+    if (match) {
+      preencherDropdownCategorias(match);
+    } else {
+      preencherDropdownCategorias();
+      $("#fCategoria").value = "__nova__";
+      atualizarLinhaNovaCat();
+      $("#fNovaCat").value = dados.categoria;
+    }
+  } else {
+    preencherDropdownCategorias();
+  }
+
+  trocarAba("form");
+  toast("Estruturado — revise e salve", "✎");
+}
+
+/* =============================================================================
+   SALVAR
+   ========================================================================== */
+function lerCategoriaSelecionada() {
+  const sel = $("#fCategoria").value;
+  if (sel === "__nova__") {
+    return $("#fNovaCat").value.trim();
+  }
+  return sel;
+}
+
+function salvar() {
+  const termo = $("#fTermo").value.trim();
+  let categoria = lerCategoriaSelecionada();
+
+  if (!termo) { toast("Informe o termo", "!"); $("#fTermo").focus(); return; }
+  if (!categoria) {
+    toast("Informe a categoria", "!");
+    ($("#fCategoria").value === "__nova__" ? $("#fNovaCat") : $("#fCategoria")).focus();
+    return;
+  }
+
+  const nova = {
+    id: proximoId++,
+    categoria,
+    termo,
+    definicao: $("#fDefinicao").value.trim(),
+    exemplo: $("#fExemplo").value.trim(),
+    formula: $("#fFormula").value.trim(),
+    tags: $("#fTags").value.split(",").map(t => t.trim()).filter(Boolean),
+    atualizado_em: hojeISO()
+  };
+
+  entradas.push(nova);
+  categoriaAtiva = categoria;     // pula para a categoria do novo item
+  termoBusca = "";
+  $("#search").value = "";
+  render();
+  fecharPainel();
+  limparForm();
+
+  // Micro-animação no card recém-criado
+  setTimeout(() => {
+    const card = document.querySelector(`.card[data-id="${nova.id}"]`);
+    if (card) {
+      card.classList.add("flash");
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, 120);
+
+  toast("Conceito salvo");
+
+  // Lembrete: tornar permanente no array CONHECIMENTO
+  console.log("Para tornar permanente, adicione ao array CONHECIMENTO:\n",
+    JSON.stringify(nova, null, 2));
+}
+
+function limparForm() {
+  ["#fTermo", "#fDefinicao", "#fExemplo", "#fFormula", "#fTags", "#fNovaCat", "#rawText"]
+    .forEach(s => { const el = $(s); if (el) el.value = ""; });
+  preencherDropdownCategorias();
+}
+
+/* =============================================================================
+   TOAST
+   ========================================================================== */
+let toastTimer;
+function toast(msg, icone = "✓") {
+  $("#toast .check").textContent = icone;
+  $("#toastMsg").textContent = msg;
+  $("#toast").classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $("#toast").classList.remove("show"), 2400);
+}
+
+/* =============================================================================
+   LIGAÇÃO DE EVENTOS
+   ========================================================================== */
+$("#search").addEventListener("input", e => {
+  termoBusca = e.target.value;
+  renderCards();
+});
+
+$("#openPanelFab").addEventListener("click", abrirPainel);
+$("#openPanelTop").addEventListener("click", abrirPainel);
+$("#closePanel").addEventListener("click", fecharPainel);
+$("#overlay").addEventListener("click", fecharPainel);
+document.addEventListener("keydown", e => { if (e.key === "Escape") fecharPainel(); });
+
+$("#tabForm").addEventListener("click", () => trocarAba("form"));
+$("#tabRaw").addEventListener("click", () => trocarAba("raw"));
+$("#fCategoria").addEventListener("change", atualizarLinhaNovaCat);
+
+$("#structureBtn").addEventListener("click", () => {
+  const txt = $("#rawText").value;
+  if (!txt.trim()) { toast("Cole algum texto primeiro", "!"); return; }
+  aplicarEstrutura(estruturarTextoBruto(txt));
+});
+
+$("#saveBtn").addEventListener("click", salvar);
+$("#clearForm").addEventListener("click", () => { limparForm(); toast("Campos limpos", "↺"); });
+
+// Ctrl/Cmd+Enter salva quando o painel está aberto
+$("#panel").addEventListener("keydown", e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") salvar();
+});
+
+/* ---- Boot ---- */
+render();
+</script>
+</body>
+</html>
