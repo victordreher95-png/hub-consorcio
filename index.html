@@ -919,6 +919,16 @@ const CONHECIMENTO = [
     formula: "",
     tags: ["comissão", "8 parcelas", "cota nova", "reativação", "carteira", "comercial"],
     atualizado_em: "2026-06-22"
+  },
+  {
+    id: 35,
+    categoria: "Estratégias",
+    termo: "Lucro do investidor na revenda (contempla e vende)",
+    definicao: "No \"contempla e vende\", o fluxo do investidor termina quando ele vende a cota contemplada para o próprio escritório, por cerca de 20-25% do valor do crédito. O lucro dele é: (valor de venda ao escritório) menos (total investido nas parcelas até contemplar). O que o escritório faz depois — revender a contemplada no site para o comprador final — é outro negócio e não entra na conta do investidor.",
+    exemplo: "Cota de R$ 100 mil contempla. O escritório compra do investidor por R$ 25 mil (25%). Se o investidor pagou R$ 12 mil em parcelas até ali, o lucro dele é R$ 13 mil. A revenda posterior pelo escritório não afeta esse resultado.",
+    formula: "",
+    tags: ["contempla e vende", "investidor", "lucro", "revenda", "25%", "escritório"],
+    atualizado_em: "2026-06-22"
   }
 ];
 
@@ -1299,6 +1309,9 @@ Use EXCLUSIVAMENTE o banco de conhecimento fornecido abaixo para responder.
 
 # COMPORTAMENTO
 - Respostas CURTAS. Uma ideia por vez. Não despeje tudo que sabe.
+- Fale como VENDEDOR, não como calculadora: foque no resultado e no benefício, não nos detalhes técnicos.
+- NÃO cite taxa de administração, fundo de reserva, percentuais ou fórmulas a não ser que o cliente pergunte diretamente. Excesso de número assusta o cliente.
+- Ao simular, dê o valor final da parcela de forma limpa (ex: "fica em torno de R$ 1.500/mês"), sem mostrar a conta nem os percentuais por trás.
 - Não dê informação que ninguém pediu.
 - Termine quase sempre com UMA pergunta que avança a conversa.
 - Espelhe o ritmo do cliente.
