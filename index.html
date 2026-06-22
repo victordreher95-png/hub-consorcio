@@ -452,6 +452,8 @@
         <input id="search" class="search" type="search"
                placeholder="Buscar por termo, definição ou tag…" autocomplete="off" />
       </div>
+      <button class="btn" id="copyAiBtn">Copiar para IA</button>
+      <button class="btn" id="downloadTxtBtn">Baixar .txt</button>
       <button class="btn btn-accent" id="openPanelTop">+ Adicionar</button>
     </div>
   </header>
@@ -1223,6 +1225,96 @@ function limparForm() {
 }
 
 /* =============================================================================
+   EXPORTAÇÃO — texto limpo para IA / .txt
+   -----------------------------------------------------------------------------
+   Gera, a partir do array CONHECIMENTO, um texto sem HTML, com cabeçalho de
+   instrução para a IA e os conceitos agrupados por categoria.
+   ========================================================================== */
+function gerarTextoConhecimento() {
+  const total = CONHECIMENTO.length;
+  const linhas = [];
+
+  linhas.push(
+    "BANCO DE CONHECIMENTO SOBRE CONSÓRCIO (curado por especialista). " +
+    "Use exclusivamente as informações abaixo para responder perguntas sobre consórcio. " +
+    "Não complemente com informação genérica da internet. " +
+    `Total de ${total} conceitos.`
+  );
+  linhas.push("");
+
+  // Agrupa por categoria, mantendo "Fundamentos" primeiro (mesma ordem da navegação)
+  const cats = [...new Set(CONHECIMENTO.map(e => e.categoria))].sort((a, b) => {
+    if (a === "Fundamentos") return -1;
+    if (b === "Fundamentos") return 1;
+    return a.localeCompare(b, "pt-BR");
+  });
+
+  for (const cat of cats) {
+    linhas.push("============================================================");
+    linhas.push(`CATEGORIA: ${cat}`);
+    linhas.push("============================================================");
+    linhas.push("");
+
+    for (const e of CONHECIMENTO.filter(x => x.categoria === cat)) {
+      linhas.push(`TERMO: ${e.termo}`);
+      if (e.definicao && e.definicao.trim()) linhas.push(`Definição: ${e.definicao.trim()}`);
+      if (e.exemplo && e.exemplo.trim())     linhas.push(`Exemplo: ${e.exemplo.trim()}`);
+      if (e.formula && e.formula.trim())     linhas.push(`Fórmula: ${e.formula.trim()}`);
+      if (e.tags && e.tags.length)           linhas.push(`Tags: ${e.tags.join(", ")}`);
+      linhas.push("");
+    }
+  }
+
+  return linhas.join("\n").trimEnd() + "\n";
+}
+
+function copiarParaIA() {
+  const texto = gerarTextoConhecimento();
+  const btn = $("#copyAiBtn");
+  const original = btn.textContent;
+  const feedback = () => {
+    btn.textContent = "Copiado!";
+    clearTimeout(btn._copiarTimer);
+    btn._copiarTimer = setTimeout(() => { btn.textContent = original; }, 1600);
+    toast("Copiado para a área de transferência");
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(texto).then(feedback).catch(() => copiarFallback(texto, feedback));
+  } else {
+    copiarFallback(texto, feedback);
+  }
+}
+
+// Fallback offline (ex.: contextos sem permissão de clipboard / file://)
+function copiarFallback(texto, ok) {
+  const ta = document.createElement("textarea");
+  ta.value = texto;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try { document.execCommand("copy"); ok(); }
+  catch (_) { toast("Não foi possível copiar", "!"); }
+  document.body.removeChild(ta);
+}
+
+function baixarTxt() {
+  const texto = gerarTextoConhecimento();
+  const blob = new Blob([texto], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "hub-consorcio.txt";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast("Arquivo baixado");
+}
+
+/* =============================================================================
    TOAST
    ========================================================================== */
 let toastTimer;
@@ -1244,6 +1336,8 @@ $("#search").addEventListener("input", e => {
 
 $("#openPanelFab").addEventListener("click", abrirPainel);
 $("#openPanelTop").addEventListener("click", abrirPainel);
+$("#copyAiBtn").addEventListener("click", copiarParaIA);
+$("#downloadTxtBtn").addEventListener("click", baixarTxt);
 $("#closePanel").addEventListener("click", fecharPainel);
 $("#overlay").addEventListener("click", fecharPainel);
 document.addEventListener("keydown", e => { if (e.key === "Escape") fecharPainel(); });
