@@ -269,6 +269,17 @@
     padding: 3px 10px; border-radius: 999px;
   }
 
+  /* Selo de uso interno — alerta sutil em âmbar, dentro da linguagem Apple/dark */
+  .card .uso-interno {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-bottom: 12px;
+    font-size: 11.5px; font-weight: 650; letter-spacing: 0.01em;
+    color: #f0b454;
+    background: rgba(240,180,84,0.10);
+    border: 1px solid rgba(240,180,84,0.28);
+    padding: 5px 11px; border-radius: 999px;
+  }
+
   .card .definicao { color: var(--text-soft); font-size: 15px; white-space: pre-wrap; }
   .card .definicao.todo { color: var(--text-faint); font-style: italic; }
 
@@ -774,11 +785,11 @@ const CONHECIMENTO = [
     id: 20,
     categoria: "Estratégias",
     termo: "Troca de cotas (Troca Inteligente)",
-    definicao: "Estratégia que a Rama mais usa: em vez de simplesmente comprar a cota do cliente por deságio, oferece-se a ele uma troca — uma cota do banco de cotas já compradas pela Rama (uma cota de deságio) + um valor no Pix que cobre o que ele já gastou. Assim o cliente sai da cota atual sem sair do consórcio, e a Rama movimenta o estoque de cotas. O Gerador de Propostas é usado para montar essas combinações.",
-    exemplo: "(números provisórios, a ajustar) Cliente com cota de veículo, R$ 23 mil já pagos. A Rama oferece uma cota com R$ 14 mil pagos + R$ 9 mil no Pix.",
+    definicao: "Estratégia que a Rama mais usa: em vez de simplesmente comprar a cota do cliente por deságio, oferece-se a ele uma troca — uma cota do banco de cotas já compradas pela Rama (uma cota de deságio) somada a um valor no Pix que cobre o que ele já gastou. Assim o cliente sai da cota atual sem sair do consórcio, e a Rama movimenta o estoque de cotas. O conceito pode ser apresentado ao cliente como um benefício (recuperar valor e seguir posicionado), mas o cálculo exato da composição (quanto de cota + quanto de Pix) é INTERNO e não deve ser revelado.",
+    exemplo: "",
     formula: "",
-    tags: ["troca de cotas", "troca inteligente", "banco de cotas", "pix", "gerador de propostas", "rama"],
-    atualizado_em: "2026-06-22"
+    tags: ["troca de cotas", "troca inteligente", "banco de cotas", "pix", "benefício", "rama"],
+    atualizado_em: "2026-06-23"
   },
   {
     id: 21,
@@ -999,6 +1010,58 @@ const CONHECIMENTO = [
     formula: "",
     tags: ["junção", "contempladas", "crédito", "mesma administradora", "HS", "soma", "caminhão"],
     atualizado_em: "2026-06-23"
+  },
+  {
+    id: 43,
+    categoria: "Fundamentos",
+    termo: "Sorteio",
+    definicao: "Uma das duas formas de contemplar (a outra é o lance). Em cada assembleia, uma ou mais cotas são sorteadas pela Loteria Federal. É um método transparente e externo, que garante isonomia: qualquer cota ativa pode ser sorteada, independentemente de lance.",
+    exemplo: "A cada assembleia, com base no resultado da Loteria Federal, uma ou mais cotas do grupo são contempladas por sorteio.",
+    formula: "",
+    tags: ["sorteio", "loteria federal", "contemplação", "assembleia", "isonomia"],
+    atualizado_em: "2026-06-23"
+  },
+  {
+    id: 44,
+    categoria: "Fundamentos",
+    termo: "Quantidade de contemplados por assembleia",
+    definicao: "A quantidade de cotas contempladas em cada assembleia depende da saúde financeira do grupo: quanto mais valor o fundo comum tem arrecadado, mais créditos podem ser liberados (se o caixa comporta dar crédito para 3 pessoas, 3 são contempladas, somando sorteio e lances). Grupos mais saudáveis contemplam mais.",
+    uso: "interno",
+    exemplo: "Se o fundo comum do grupo comporta liberar 3 créditos na assembleia, 3 cotas são contempladas.",
+    formula: "",
+    tags: ["contemplação", "assembleia", "fundo comum", "saúde do grupo", "quantidade"],
+    atualizado_em: "2026-06-23"
+  },
+  {
+    id: 45,
+    categoria: "Fundamentos",
+    termo: "Tipos de cota",
+    definicao: "Os principais estados de uma cota no consórcio. Não contemplada: cota ativa que ainda não foi sorteada nem ganhou lance — está pagando e aguardando contemplação. Contemplada: cota que já adquiriu o direito à carta de crédito (por sorteio ou lance). Cancelada: cota encerrada antes do fim; na HS, a cota cancela quando o cliente fica 3 meses seguidos sem pagar (o que acontece com o valor e o processo de devolução ainda será detalhado). Junção: soma de várias contempladas da mesma administradora para formar um crédito maior.",
+    exemplo: "",
+    formula: "",
+    tags: ["tipos de cota", "contemplada", "não contemplada", "cancelada", "junção", "3 meses"],
+    atualizado_em: "2026-06-23"
+  },
+  {
+    id: 46,
+    categoria: "Mecânica de Lance",
+    termo: "Modalidades de lance",
+    definicao: "Os lances funcionam por número de parcelas (oferta-se antecipação de parcelas). Modalidades: Lance livre — o consorciado oferece o percentual que quiser; quem oferta mais leva. Lance embutido — usa parte do próprio crédito como lance (fixo em 30% na HS). Lance fidelidade — dá vantagem e mais chance de contemplação a quem mantém as parcelas em dia; existem grupos com fidelidade de 6, 12 ou 18 meses pagando em dia. O lance fidelidade pode somar com o embutido (no exemplo da apresentação, fidelidade + embutido formaram os 30%). É um ótimo argumento para aumentar chances de contemplação e para manter os pagantes em dia, evitando inadimplência. (Lance fixo: a confirmar/pesquisar.)",
+    exemplo: "",
+    formula: "",
+    tags: ["lance livre", "lance embutido", "lance fidelidade", "parcelas", "contemplação", "fidelidade", "inadimplência"],
+    atualizado_em: "2026-06-23"
+  },
+  {
+    id: 47,
+    categoria: "Estratégias",
+    termo: "Cálculo da Troca Inteligente",
+    definicao: "(A DEFINIR — Victor vai trazer a fórmula fechada da composição: quanto entra de cota de deságio e quanto entra de Pix.) Esta informação é de uso estritamente interno: nunca revelar o cálculo ao cliente.",
+    uso: "interno",
+    exemplo: "",
+    formula: "",
+    tags: ["troca inteligente", "cálculo", "fórmula", "interno", "margem"],
+    atualizado_em: "2026-06-23"
   }
 ];
 
@@ -1129,6 +1192,9 @@ function renderCards() {
       </div>` : "";
     const tags = (e.tags && e.tags.length) ? `
       <div class="tags">${e.tags.map(t => `<span class="tag">#${esc(t)}</span>`).join("")}</div>` : "";
+    const usoInterno = e.uso === "interno"
+      ? `<div class="uso-interno">🔒 USO INTERNO — não compartilhar com cliente</div>`
+      : "";
 
     return `
       <article class="card" data-id="${e.id}" style="animation-delay:${Math.min(i * 0.04, 0.4)}s">
@@ -1136,6 +1202,7 @@ function renderCards() {
           <h3 class="termo">${esc(e.termo)}</h3>
           <span class="cat-tag">${esc(e.categoria)}</span>
         </div>
+        ${usoInterno}
         ${def}
         ${exemplo}
         ${formula}
@@ -1456,6 +1523,7 @@ Use o banco abaixo como única fonte:
 
     for (const e of CONHECIMENTO.filter(x => x.categoria === cat)) {
       linhas.push(`TERMO: ${e.termo}`);
+      if (e.uso === "interno") linhas.push("[USO INTERNO — NÃO compartilhar com cliente]");
       if (e.definicao && e.definicao.trim()) linhas.push(`Definição: ${e.definicao.trim()}`);
       if (e.exemplo && e.exemplo.trim())     linhas.push(`Exemplo: ${e.exemplo.trim()}`);
       if (e.formula && e.formula.trim())     linhas.push(`Fórmula: ${e.formula.trim()}`);
