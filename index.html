@@ -1205,6 +1205,17 @@ const CONHECIMENTO = [
     formula: "",
     tags: ["mito", "uso", "versatilidade", "serviços", "carta de crédito"],
     atualizado_em: "2026-06-23"
+  },
+  {
+    id: 79,
+    categoria: "Operações Rama",
+    termo: "Troca Inteligente — Cálculo Completo",
+    definicao: "A Troca Inteligente é a operação em que o cliente entrega cotas (que seriam quitadas) e recebe cotas de deságio do estoque da Rama + um Pix, de forma que o total que ele recebe cubra o que gastou. A Rama lucra na diferença entre o teto autorizado e o custo da montagem. ATENÇÃO: a Troca só serve para QUITAÇÃO, não para deságio puro. 1) ORÇAMENTO (TETO DE CUSTO): o robô calcula o recebível de quitação de cada cota do cliente. Teto = soma dos recebíveis × 60% (REGRA PADRÃO, use sempre) ou × 70% (exceção, só cliente PARCEIRO). Na prática, o teto que vale é o número que o Rafa libera, que costuma ser essa porcentagem arredondada pra cima num valor redondo (ex.: 70% real = 27.304 → Rafa libera 27.500). Na dúvida, confirme o teto com ele. 2) O QUE A RAMA ENTREGA: cotas de deságio do estoque + Pix. Valor de venda da cota (custo real dela): IMÓVEL = pago × 36%; VEÍCULO = pago × 39%. O Pix é dinheiro vivo (custa 100%) e é o que falta pra cobrir o cliente: Pix = pago total do cliente − soma do pago das cotas dadas. 3) CUSTO DA OPERAÇÃO = soma dos valores de venda das cotas dadas + Pix. 4) AS 3 TRAVAS (todas precisam bater): (a) custo ≤ teto, senão não há comissão; (b) Você recebe = pago do cliente, pra cobrir o que ele gastou; (c) parcela das cotas dadas ≈ parcela do cliente, senão ele não aceita. 5) COMISSÃO = Teto − Custo da operação. A folga é a sua margem. 6) REGRA DE OURO: escolha as cotas pela PARCELA (a soma das parcelas das cotas dadas tem que bater a parcela do cliente). Tensão Pix×comissão: quanto mais pago nas cotas dadas, menos Pix, menor custo, maior comissão — mas cota muito paga tem parcela alta. Cada R$ 1.000 a mais de Pix encarece a operação em ~R$ 610. Objetivo: maximizar o pago em cota respeitando a parcela e o teto. SEMPRE conferir se a cota está RESERVADA antes de usar (vêm marcadas em amarelo / \"RESERVADA\" no estoque); reservada não entra. (Obs: o cálculo de como o robô chega no recebível de quitação segue como caixa-preta; tudo na troca deriva desse recebível como número-âncora.)",
+    uso: "interno",
+    exemplo: "CASO REAL VALIDADO (Jefferson, fechado): cliente entregou 4 cotas veículo somando pago 52.335,95, parcela 1.323,67, recebível total 39.006,03. Teto (parceiro 70%, arredondado Rafa) = 27.500. Proposta fechada com 5 cotas dadas (836/2482, 808/1374-1, 832/386, 811/141-1, 802/359-1): valor em cotas 41.023,16 + Pix 11.500 = Você recebe 52.523,16. Custo da operação = 15.999,03 (soma VV 39%) + 11.500 = 27.499,03, dentro do teto de 27.500. Parcela passou para 1.682,88.",
+    formula: "Teto = soma recebíveis × 60% (padrão) ou 70% (parceiro) → na prática o teto que o Rafa libera. Valor de venda da cota = pago × 36% (imóvel) ou × 39% (veículo). Pix = pago do cliente − soma do pago das cotas dadas. Custo da operação = soma dos valores de venda + Pix. Comissão = Teto − Custo. Travas: custo≤teto · você recebe=pago do cliente · parcela≈parcela do cliente.",
+    tags: ["troca inteligente", "cálculo", "quitação", "teto", "comissão", "Pix", "cotas de deságio", "parcela", "interno", "Rama"],
+    atualizado_em: "2026-06-25"
   }
 ];
 
